@@ -1,0 +1,24 @@
+---
+- name: Mise à jour et installation des paquets communs
+  apt:
+    update_cache: yes
+    name:
+      - git
+      - curl
+      - ufw
+    state: present
+
+- name: Configurer le pare-feu UFW
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 22    # SSH
+    - 80    # HTTP
+    - 443   # HTTPS
+
+- name: Activer UFW
+  ufw:
+    state: enabled
+    enabled: yes

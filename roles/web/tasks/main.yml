@@ -1,0 +1,58 @@
+---
+- name: Setup Nginx and PHP
+  apt:
+    name:
+      - nginx
+      - python3-certbot-nginx
+      - php-fpm
+      - php-mysql
+      - php-xml
+      - php-curl
+      - php-gd
+      - php-mbstring
+    state: present
+    update_cache: yes
+  notify: Redémarrer Nginx
+
+- name: Télécharger et extraire WordPress
+  unarchive:
+    src: "{{ wordpress_download_url }}"
+    dest: "{{ wordpress_install_dir }}"
+    remote_src: yes
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  notify: Redémarrer Nginx
+
+- name: Configurer Nginx pour WordPress
+  template:
+    src: wp-config.php.j2
+    dest: "{{ wordpress_install_dir }}/wp-config.php"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  notify: Redémarrer Nginx
+
+- name: Configurer le vhost Nginx
+  template:
+    src: vhost.conf.j2
+    dest: /etc/nginx/sites-available/{{ domain_name }}
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Redémarrer Nginx
+
+- name: Activer le site WordPress
+  file:
+    src: /etc/nginx/sites-available/{{ domain_name }}
+    dest: /etc/nginx/sites-enabled/{{ domain_name }}
+    state: link
+  notify: Redémarrer Nginx
+
+- name: Obtention du certificat SSL avec Certbot
+  command: >
+    certbot --nginx -n --agree-tos --email {{ email_certbot }}
+    -d {{ domain_name }}
+  args:
+    creates: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+  notify: Redémarrer Nginx

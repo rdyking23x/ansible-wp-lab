@@ -1,0 +1,36 @@
+---
+- name: Installer MySQL/MariaDB
+  apt:
+    name: mariadb-server
+    state: present
+    update_cache: yes
+  notify: Redémarrer MySQL
+
+- name: Activer mariadb
+  service:
+    name: mariadb
+    enabled: yes
+
+- name: Configurer le mot de passe root de MySQL
+  mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    check_implicit_admin: yes
+
+- name: Créer la base de données WordPress
+  mysql_db:
+    name: "{{ wordpress_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Créer l'utilisateur de la base de données WordPress
+  mysql_user:
+    name: "{{ wordpress_db_user }}"
+    password: "{{ wordpress_db_password }}"
+    priv: "{{ wordpress_db_name }}.*:ALL"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
