@@ -6,6 +6,7 @@
     - git
     - curl
     - ufw
+    - python3-pip
     state: present
 
 - name: Configurer le pare-feu UFW
