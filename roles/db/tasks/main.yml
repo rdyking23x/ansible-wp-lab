@@ -6,7 +6,7 @@
     update_cache: yes
   notify: Redémarrer MySQL
 
-- name: Install PyMySQL for Python3
+- name: Install PyMySQL for Python3 Search
   ansible.builtin.pip:
     name: PyMySQL
     executable: pip3
