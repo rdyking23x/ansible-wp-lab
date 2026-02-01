@@ -3,9 +3,9 @@
   apt:
     update_cache: yes
     name:
-      - git
-      - curl
-      - ufw
+    - git
+    - curl
+    - ufw
     state: present
 
 - name: Configurer le pare-feu UFW
@@ -14,11 +14,10 @@
     port: "{{ item }}"
     proto: tcp
   loop:
-    - 22    # SSH
-    - 80    # HTTP
-    - 443   # HTTPS
+  - 22 # SSH
+  - 80 # HTTP
+  - 443 # HTTPS
 
 - name: Activer UFW
   ufw:
     state: enabled
-    enabled: yes
