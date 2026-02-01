@@ -6,6 +6,22 @@
     update_cache: yes
   notify: Redémarrer MySQL
 
+- name: Install PyMySQL for Python3
+  ansible.builtin.pip:
+    name: PyMySQL
+    executable: pip3
+  when: ansible_python_version is version('3', '>=')
+
+- name: Install PyMySQL for Python2
+  ansible.builtin.pip:
+    name: PyMySQL
+    executable: pip
+  when: ansible_python_version is version('3', '<')
+
+- name: Verify PyMySQL installation
+  ansible.builtin.shell: "python{{ ansible_python_version.major }} -c 'import pymysql'"
+  changed_when: false
+
 - name: Activer mariadb
   service:
     name: mariadb
